@@ -1,0 +1,6 @@
+
+# We don't want to push env folders to Github
+env/
+
+# We don't want the .git folder being pushed to Github either
+.git/
