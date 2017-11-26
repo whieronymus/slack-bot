@@ -3,15 +3,30 @@ import time
 from slackclient import SlackClient
 import pdb
 
-
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
 AT_BOT = "<@" + BOT_ID + ">"
-EXAMPLE_COMMAND = "do"
 
 # instantiate Slack
 slack_client = SlackClient()
+
+
+def ditto(cmd):
+    return " ".join(cmd.split()[1:])
+
+
+def startproject(cmd):
+    project_os = cmd.split()[1]
+    if project_os == "windows":
+        response = "These are the commands to start a new Windows Project"
+    elif project_os == "mac":
+        response = "Different start project commands for mac"
+    elif project_os == "linux":
+        response = "Linux commands for new project"
+    else:
+        response = "Sorry, I only know Mac, Linux and Windows I don't know what {} is".format(project_os)
+    return response
 
 
 def handle_command(command, channel):
@@ -20,29 +35,18 @@ def handle_command(command, channel):
         are valid commands. If so, then acts on the commands. If not,
         returns back what it needs for clarification.
     """
-    response = "Not sure what you mean. Use the *" + EXAMPLE_COMMAND + \
-               "* command with numbers, delimited by spaces."
-    if command.startswith(EXAMPLE_COMMAND):
-        response = "Sure...write some more code then I can do that!"
 
-    if command.startswith("ditto"):
-        response = command.replace("ditto", "")
+    commands = {"ditto": ditto, "startproject": startproject}
 
-    if command.startswith("startproject"):
-        project_os = command.split()[1]
-        if project_os == "windows":
-            response = "These are the commands to start a new Windows Project"
-        elif project_os == "mac":
-            response = "Different start project commands for mac"
-        elif project_os == "linux":
-            response = "Linux commands for new project"
-        else:
-            response = "Sorry, I only know Mac, Linux and Windows I don't know what {} is".format(project_os)
+    cmd = command.split()[1]
+
+    if cmd in commands:
+        response = commands[cmd](command)
+    else:
+        response = "Sorry, I have not been trained yet to do that."
 
     slack_client.api_call("chat.postMessage", channel=channel,
                           text=response, as_user=True)
-
-
 
 
 def parse_slack_output(slack_rtm_output):
