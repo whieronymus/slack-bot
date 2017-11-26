@@ -4,3 +4,6 @@ env/
 
 # We don't want the .git folder being pushed to Github either
 .git/
+
+# For people using PyCharm
+.idea/
