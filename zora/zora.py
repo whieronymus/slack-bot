@@ -14,11 +14,21 @@ slack_client = SlackClient(SLACK_TOKEN)
 
 
 def ditto_cmd(cmd):
+    """
+    returns the same message as the user sent, just without the first word (command name)
+    :param cmd: str, message to be repeated
+    :return: str, message to be printed back (same as original)
+    """
     return " ".join(cmd.split()[1:])
 
 
 def startproject_cmd(cmd):
-    project_os = cmd.split()[1]
+    """
+    Shows procedure used to start a new project on a certain platform
+    :param cmd: str, name of OS
+    :return: str, list of commands
+    """
+    project_os = cmd.split()[1].lower()
     if project_os == "windows":
         response = "These are the commands to start a new Windows Project"
     elif project_os == "mac":
@@ -31,26 +41,47 @@ def startproject_cmd(cmd):
 
 
 def help_cmd(cmd):
+    """
+    Shows help for certain command, if none given shows help for every command
+    :param cmd: str, name of command (optional)
+    :return: str, help list
+    """
     split = cmd.split()
     if len(split) == 1:
         lines = ["{}: {}".format(cmd.name, cmd.help_text) for cmd in Command.get.values()]
     elif split[1] in Command.get:
-        lines = ["{}: {}".format(Command.get[split[1]].name, Command.get[split[1]].help_text)]
+        cmd = Command.get[split[1].lower()]
+        lines = ["{}: {}".format(cmd.name, cmd.help_text)]
     else:
         lines = ["Sorry, this command is not found."]
     return "\n".join(lines)
 
 
 class Command:
-    get = defaultdict(lambda: None)
+    """
+    Class for commands, used for easier access
+    """
+    get = defaultdict(lambda: None)  # this is the list of all commands. If command is searched but not in the dict,
+    # None is returned
 
     def __init__(self, func, name, help_text):
+        """
+        Sets all the parameters & adds the command to list of all
+        :param func: pointer to the function
+        :param name: str, name of the function
+        :param help_text: str, help text to be displayed when help command is called
+        """
         self.func = func
         self.name = name
         self.help_text = help_text
         Command.get[name] = self
 
     def execute(self, message):
+        """
+        Executes the function it is pointing to.
+        :param message: str, user's message, is passed to the function
+        :return: str, returns whatever the function returns
+        """
         return self.func(message)
 
 
@@ -61,9 +92,9 @@ def handle_command(text, channel):
         returns back what it needs for clarification.
     """
 
-    cmd_name = text.split()[0]
-
-    cmd = Command.get[cmd_name]
+    cmd_name = text.split()[0].lower()
+    cmd = Command.get[cmd_name]  # Get the command's name and the appropriate instance of Command class. None if
+    # there is no instance with such name
 
     if cmd:
         response = cmd.execute(text)
@@ -85,7 +116,7 @@ def parse_slack_output(slack_rtm_output):
         for output in output_list:
             if output and 'text' in output and AT_BOT in output['text']:
                 # return text after the @ mention, whitespace removed
-                command = output['text'].split(AT_BOT)[1].strip().lower()
+                command = output['text'].split(AT_BOT)[1].strip()
                 channel = output['channel']
                 return command, channel
 
@@ -94,6 +125,10 @@ def parse_slack_output(slack_rtm_output):
 
 
 def define_commands():
+    """
+    Defines all commands. Shall only be executed once, when the code starts.
+    :return: None
+    """
     Command(ditto_cmd,
             "ditto",
             "Repeats said text")
