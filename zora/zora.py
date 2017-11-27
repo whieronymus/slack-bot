@@ -28,7 +28,10 @@ def startproject_cmd(cmd):
     :param cmd: str, name of OS
     :return: str, list of commands
     """
-    project_os = cmd.split()[1].lower()
+    if len(cmd.split) > 1:
+        project_os = cmd.split()[1].lower()
+    else:
+        return "Please enter an OS!"
     if project_os == "windows":
         response = "These are the commands to start a new Windows Project"
     elif project_os == "mac":
