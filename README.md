@@ -21,6 +21,8 @@ If you'd like to get involved just DM me @kill.will on the Slack Channel and I'l
 some ideas to get started!
 
 #### RookieBot
+Coming Soon!
+
 Zora's development took off a little faster than I had anticipated. Her structure and setup
 is a bit more advanced and I'm afraid it will scare off newbies from thinking they have the
 skills to contribute.
@@ -30,6 +32,9 @@ And thus... RookieBot was born!
 RookieBot's development will use fairly simple and fairly basic techniques, that will be
 easier for beginners to follow. So if you're new but still want to practice/contribute
 RookieBot is there for you! RookieBot will always be there for you.
+
+#### RavenBot
+Coming soon!
 
 
 
