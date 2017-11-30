@@ -13,3 +13,4 @@ Slackbot is a simple high level wrapper for a Slack Bot
 
 * Easy command configuration
 * Simple syntax
+* Error handling
