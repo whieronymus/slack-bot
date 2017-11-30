@@ -10,7 +10,7 @@ import pdb
 import inspect
 
 
-class slackcommand:
+class SlackCommand:
     """Decorate a function as a new command
 
     Keyword arguments:
@@ -56,10 +56,29 @@ class SlackBot(SlackClient):
     """
     def __init__(self, key, prefix="?"):
         super().__init__(key)  # Initialize the bot with the token
-        self.commands = {}
         self.prefix = prefix
         self.read_incomming_thread = threading.Thread(target=self.read_messages)
         self.read_incomming_thread.start()  # Start reading all incoming messages
+        self.events = {"channel_archive": self.on_channel_archive,  # All the events which can happen
+                       "channel_created": self.on_channel_create,
+                       "channel_deleted": self.on_channel_delete,
+                       "channel_joined": self.on_channel_join,
+                       "channel_left": self.on_channel_leave,
+                       "channel_marked": self.on_channel_marked,
+                       "channel_rename": self.on_channel_rename,
+                       "commands_changed": self.on_commands_change,
+                       "emoji_changed": self.on_emoji_change,
+                       "file_created": self.on_file_create,
+                       "file_deleted": self.on_file_delete,
+                       "group_joined": self.on_group_join,
+                       "group_left": self.on_group_leave,
+                       "group_marked": self.on_group_marked,
+                       "group_rename": self.on_group_rename,
+                       "member_joined_channel": self.on_member_join_channel,
+                       "member_left_channel": self.on_member_leave_channel,
+                       "message": self.on_message,
+                       "team_join": self.on_member_join_team,
+                       "hello": self.on_ready}
 
     def send_message(self, channel, content):
         """Send a message to a channel
@@ -68,31 +87,7 @@ class SlackBot(SlackClient):
         channel -- the slack channel ID
         content -- the message text to send
         """
-        self.api_call("chat.postMessage", channel=channel, text=content, as_user=True)
-
-    def on_message(self, message):
-        """This method is ran every time a message is sent"""
-        pass
-
-    def on_ready(self):
-        """This method is when the bot is ready and reading messages"""
-        pass
-
-    def on_command(self, command):
-        """This method is ran every time a command is sent"""
-        cmd = command.get("args")[0][len(self.prefix):]  # Get the command w/o prefix
-        args = command.get("args")[1:]
-        if cmd in slackcommand.commands:  # If the command is an actual command
-            ctx = Context(self, command)  # Get the context of the command
-            cmd_function = slackcommand.commands.get(cmd)
-            ctx.callback = cmd_function
-            ctx.command["callback"] = cmd_function
-            ctx.command["name"] = cmd
-            ctx.command_name = cmd
-            try:
-                cmd_function(ctx, *args)  # Invoke the command
-            except TypeError:
-                ctx.send("Invalid Syntax: `" + self.get_usage(ctx.command) + "`")
+        self.rtm_send_message(channel, content)
 
     def parse_output(self, output_list):
         """Parse the output of a self.rtm_read() method
@@ -102,30 +97,24 @@ class SlackBot(SlackClient):
         """
         if output_list:
             for output in output_list:
-                if output.get("type") == "message":
-                    content = output.get("text")
-                    channel = output.get("channel")
-                    author = output.get("user")
-                    timestamp = output.get("ts")
-                    return {"content": content, "channel": channel, "author": author, "ts": timestamp}
-        return None  # If there is no messages
+                event_function = self.events.get(output.get("type"))
+                if event_function:
+                    event_function(**output)
 
     def get_command(self, command_name):
-        d = {"name": command_name, "callback": slackcommand.commands.get(command_name)}
-        return d
+        c = {"name": command_name, "callback": SlackCommand.commands.get(command_name)}
+        return c
 
     def read_messages(self):
         """Continuously recieve new messages"""
         if self.rtm_connect():
-            self.on_ready()
             while True:
                 msg = self.parse_output(self.rtm_read())  # Get message from output
                 if msg:
                     if msg.get("content").startswith(self.prefix):  # If message starts with prefix
                         msg["args"] = msg.get("content").split()
                         self.on_command(msg)
-                    self.on_message(msg)
-                time.sleep(0.2)  # 0.2 Second interval between checking messages
+                time.sleep(0.1)  # 0.2 Second interval between checking messages
 
     def get_usage(self, command):
         args_spec = inspect.getargspec(command.get("callback"))  # Get arguments of command
@@ -137,7 +126,104 @@ class SlackBot(SlackClient):
                 default_arg[0] = "["
                 default_arg[-1] = "]"
                 args_info[-(index + 1)] = "".join(default_arg)
-        if args_spec.varargs:
+        if args_spec.varargs:  # Compensate for *args
             args_info.append("<" + args_spec.varargs + ">")
-        args_info.insert(0, self.prefix + command.get("name")) # Add command name to the front
-        return " ".join(args_info) # Return args
+        args_info.insert(0, self.prefix + command.get("name"))  # Add command name to the front
+        return " ".join(args_info)  # Return args
+
+    def on_message(self, **message):
+        """This method is ran every time a message is sent"""
+        if message.get("text").startswith(self.prefix):
+            message["args"] = message.get("text").split()
+            self.on_command(message)
+
+    def on_ready(self, **output):
+        """This method is when the bot is ready and reading messages"""
+        print(output.get("type"))
+
+    def on_command(self, command):
+        """This method is ran every time a command is sent"""
+        cmd = command.get("args")[0][len(self.prefix):]  # Get the command w/o prefix
+        args = command.get("args")[1:]
+        if cmd in SlackCommand.commands:  # If the command is an actual command
+            ctx = Context(self, command)  # Get the context of the command
+            cmd_function = SlackCommand.commands.get(cmd)
+            ctx.command["callback"] = cmd_function
+            ctx.command["name"] = cmd
+            ctx.command_name = cmd
+            try:
+                cmd_function(ctx, *args)  # Invoke the command
+            except TypeError:
+                ctx.send("Invalid Syntax: `" + self.get_usage(ctx.command) + "`")
+
+    def on_channel_archive(self, **output):
+        """A channel was archived"""
+        pass
+
+    def on_channel_create(self, **output):
+        """A channel was created"""
+        pass
+
+    def on_channel_delete(self, **output):
+        """A channel was deleted"""
+        pass
+
+    def on_channel_join(self, **output):
+        """You joined a channel"""
+        pass
+
+    def on_channel_leave(self, **output):
+        """You left a channel"""
+        pass
+
+    def on_channel_marked(self, **output):
+        """Your channel read marker was updated"""
+        pass
+
+    def on_channel_rename(self, **output):
+        """A channel was renamed"""
+        pass
+
+    def on_commands_change(self, **output):
+        """A slash command has been added or changed"""
+        pass
+
+    def on_emoji_change(self, **output):
+        """A custom emoji has been added or changed"""
+        pass
+
+    def on_file_create(self, **output):
+        """A file was created"""
+        pass
+
+    def on_file_delete(self, **output):
+        """A file was deleted"""
+        pass
+
+    def on_group_join(self, **output):
+        """You joined a private channel"""
+        pass
+
+    def on_group_leave(self, **output):
+        """You left a private channel"""
+        pass
+
+    def on_group_marked(self, **output):
+        """A private channel read marker was updated"""
+        pass
+
+    def on_group_rename(self, **output):
+        """A private channel was renamed"""
+        pass
+
+    def on_member_join_channel(self, **output):
+        """A user joined a public or private channel"""
+        pass
+
+    def on_member_leave_channel(self, **output):
+        """A user left a public or private channel"""
+        pass
+
+    def on_member_join_team(self, **output):
+        """A new member has joined"""
+        pass
