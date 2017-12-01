@@ -26,6 +26,5 @@ class Bot(SlackBot):
         ctx.send(help_info)
 
     def on_member_join_team(self, **output):
-        pprint(output)
         user = output.get("user").get("profile")
         self.send_message(self.welcome_channel, "{} has joined ClubPython @here".format(user.get("display_name")))
