@@ -30,6 +30,3 @@ class Bot(SlackBot):
         pprint(output)
         user = output.get("user").get("profile")
         self.send_message(self.welcome_channel, "{} has joined ClubPython @here".format(user.get("display_name")))
-
-token = open("token.txt").read().strip()
-ravenkls = Bot(token)

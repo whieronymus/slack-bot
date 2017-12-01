@@ -6,7 +6,7 @@ import pdb
 
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
-SLACK_TOKEN = os.environ.get("SLACK_TOKEN")
+SLACK_TOKEN = os.environ.get("SLACK_TOKEN_ZORA")
 AT_BOT = "<@" + BOT_ID + ">"
 
 # instantiate Slack
@@ -143,7 +143,7 @@ def define_commands():
             "Displays help for given command or all if none given.")
 
 
-if __name__ == "__main__":
+def main():
     define_commands()
 
     READ_WEBSOCKET_DELAY = 1  # 1 second delay between reading from firehose
@@ -157,6 +157,9 @@ if __name__ == "__main__":
     else:
         print("Connection failed. Invalid Slack token or bot ID?")
 
+if __name__ == "__main__":
+    main()
+
 # ----vv---- used for local testing
 
 # if __name__ == "__main__":
@@ -169,4 +172,3 @@ if __name__ == "__main__":
 #
 #     while True:
 #         handle_command(input("Enter the command:  "), "a")
-
