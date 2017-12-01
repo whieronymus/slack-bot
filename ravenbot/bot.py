@@ -1,4 +1,6 @@
 from ravenbot.Slack.slack import SlackBot, SlackCommand
+import requests
+import json
 
 
 class Bot(SlackBot):
@@ -24,6 +26,14 @@ class Bot(SlackBot):
                 help_info += "\n• `" + cmd + "`"  # List commands
             help_info += "\n\n Type `help <command>` for more info on that command"
         ctx.send(help_info)
+
+    @SlackCommand()
+    def joke(ctx):
+        """Tell me a joke!"""
+        response = requests.get("https://icanhazdadjoke.com/", headers={"Access: ": "application/json"})
+        json_load = json.loads(response.text)
+        if json_load.get("status") == 200:
+            ctx.send(json_load.get("joke"))
 
     def on_member_join_team(self, **output):
         user = output.get("user").get("profile")
