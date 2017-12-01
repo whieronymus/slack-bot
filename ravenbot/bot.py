@@ -30,7 +30,9 @@ class Bot(SlackBot):
     @SlackCommand()
     def joke(ctx):
         """Tell me a joke!"""
-        response = requests.get("https://icanhazdadjoke.com/", headers={"Access: ": "application/json"})
+        response = requests.get("https://icanhazdadjoke.com/", headers={"Access": "application/json",
+                                                                        "User-Agent": "Waffle Slack Bot",
+                                                                        "From": "https://github.com/whieronymus"})
         json_load = json.loads(response.text)
         if json_load.get("status") == 200:
             ctx.send(json_load.get("joke"))
