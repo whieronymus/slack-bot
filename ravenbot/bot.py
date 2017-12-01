@@ -1,5 +1,4 @@
-from Slack.slack import SlackBot, SlackCommand
-from pprint import pprint
+from ravenbot.Slack.slack import SlackBot, SlackCommand
 
 
 class Bot(SlackBot):
