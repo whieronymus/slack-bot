@@ -135,9 +135,9 @@ class SlackBot(SlackClient):
         """This method is ran every time a message is sent"""
         user = self.api_call("users.info", user=message.get("user"))
         channel = self.api_call("channels.info", channel=message.get("channel"))
-        logger.info("({}) {}: {}".format(channel.get("channel").get("name"),
-                                         user.get("profile").get("display_name"),
-                                         message.get("text")))
+        self.__logger.info("({}) {}: {}".format(channel.get("channel").get("name"),
+                                                user.get("profile").get("display_name"),
+                                                message.get("text")))
         if message.get("text").startswith(self.prefix):
             message["args"] = message.get("text").split()
             self.on_command(message)
