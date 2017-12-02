@@ -5,7 +5,7 @@ from collections import defaultdict
 import pdb
 import logging
 import random
-from greetings import greetings
+from .greetings import greetings
 
 
 # starterbot's ID as an environment variable
