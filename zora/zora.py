@@ -38,10 +38,6 @@ def greet_cmd(cmd):
     return greetings.randomchoice()
 
 
-cmd = input("What is your command")
-
-
-
 def startproject_cmd(cmd):
     """
     Shows procedure used to start a new project on a certain platform
