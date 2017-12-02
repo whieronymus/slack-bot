@@ -25,7 +25,7 @@ def ditto_cmd(cmd):
 
 
 def cats_cmd(cmd):
-    eats = random.randint(1,5):
+    eats = random.randint(1,5)
 
     if eats == 1:
         return "Cats are Yummy! No kittys here."
@@ -33,7 +33,13 @@ def cats_cmd(cmd):
         # send cat picture
         return "<Cat Picture>"
 
-    
+def greet_cmd(cmd):
+    greetings = ['hi', "hello", "hola", "konichiwa"]
+    return greetings.randomchoice()
+
+
+cmd = input("What is your command")
+
 
 
 def startproject_cmd(cmd):
@@ -155,8 +161,11 @@ def define_commands():
             "help",
             "Displays help for given command or all if none given.")
     Command(cats_cmd, 
-            "yummy"
-            "Returns a picture of a cat")   
+            "yummy",
+            "Returns a picture of a cat")
+    Command(greet_cmd, 
+            "hi",
+            "Says hi in a random in a random language")  
 
 
 def main():
