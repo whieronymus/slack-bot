@@ -29,7 +29,7 @@ def import_cmd(cmd):
     """
     Returns valuable reminders, code, tutorials, etc
     """
-    module = cmd.split()[1:]
+    module = cmd.split()[1].lower().strip()
     default = "No module named {}".format(module)
 
     zen = """
@@ -56,7 +56,7 @@ If the implementation is easy to explain, it may be a good idea.
 Namespaces are one honking great idea -- let's do more of those!```
 """
 
-    if module = "this":
+    if module == "this":
         response = zen
     else:
         response = default
