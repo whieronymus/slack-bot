@@ -4,6 +4,7 @@ from slackclient import SlackClient
 from collections import defaultdict
 import pdb
 import logging
+import random
 
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
@@ -21,6 +22,18 @@ def ditto_cmd(cmd):
     :return: str, message to be printed back (same as original)
     """
     return " ".join(cmd.split()[1:])
+
+
+def cats_cmd(cmd):
+    eats = random.randint(1,5):
+
+    if eats == 1:
+        return "Cats are Yummy! No kittys here."
+    else:
+        # send cat picture
+        return "<Cat Picture>"
+
+    
 
 
 def startproject_cmd(cmd):
@@ -141,6 +154,9 @@ def define_commands():
     Command(help_cmd,
             "help",
             "Displays help for given command or all if none given.")
+    Command(cats_cmd, 
+            "yummy"
+            "Returns a picture of a cat")   
 
 
 def main():
