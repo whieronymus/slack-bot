@@ -164,7 +164,7 @@ def define_commands():
     Command(greet_cmd, 
             "hi",
             "Says hi in a random in a random language")  
-zo
+
 
 def main():
     define_commands()
