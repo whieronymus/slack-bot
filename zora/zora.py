@@ -7,6 +7,7 @@ import logging
 import random
 from .greetings import greetings
 
+
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN_ZORA")
