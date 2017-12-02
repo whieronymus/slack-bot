@@ -1,12 +1,14 @@
 from ravenbot.Slack.slack import SlackBot, SlackCommand
 import requests
 import json
+import logging
 
 
 class Bot(SlackBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.welcome_channel = "#greeters"
+        self.logger = logging.getLogger(__name__)
 
     @SlackCommand()
     def ping(ctx):
@@ -40,3 +42,4 @@ class Bot(SlackBot):
     def on_member_join_team(self, **output):
         user = output.get("user").get("profile")
         self.send_message(self.welcome_channel, "{} has joined ClubPython @here".format(user.get("display_name")))
+        self.logger.info("New member has joined the team! ({})".format(user.get("display_name")))

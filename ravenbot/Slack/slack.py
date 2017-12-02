@@ -8,6 +8,7 @@ import json
 import re
 import pdb
 import inspect
+import logging
 
 
 class SlackCommand:
@@ -79,6 +80,7 @@ class SlackBot(SlackClient):
                        "message": self.on_message,
                        "team_join": self.on_member_join_team,
                        "hello": self.on_ready}
+        self.__logger = logging.getLogger(__name__)
 
     def send_message(self, channel, content):
         """Send a message to a channel
@@ -88,6 +90,7 @@ class SlackBot(SlackClient):
         content -- the message text to send
         """
         self.rtm_send_message(channel, content)
+        self.__logger.debug("Sent a message to {}: {}".format(channel, content))
 
     def parse_output(self, output_list):
         """Parse the output of a self.rtm_read() method
@@ -100,6 +103,7 @@ class SlackBot(SlackClient):
                 event_function = self.events.get(output.get("type"))
                 if event_function:
                     event_function(**output)
+                self.__logger.debug(output)
 
     def get_command(self, command_name):
         c = {"name": command_name, "callback": SlackCommand.commands.get(command_name)}
@@ -109,11 +113,7 @@ class SlackBot(SlackClient):
         """Continuously recieve new messages"""
         if self.rtm_connect():
             while True:
-                msg = self.parse_output(self.rtm_read())  # Get message from output
-                if msg:
-                    if msg.get("content").startswith(self.prefix):  # If message starts with prefix
-                        msg["args"] = msg.get("content").split()
-                        self.on_command(msg)
+                self.parse_output(self.rtm_read())  # Get message from output
                 time.sleep(0.1)  # 0.2 Second interval between checking messages
 
     def get_usage(self, command):
@@ -133,6 +133,11 @@ class SlackBot(SlackClient):
 
     def on_message(self, **message):
         """This method is ran every time a message is sent"""
+        user = self.api_call("users.info", user=message.get("user"))
+        channel = self.api_call("channels.info", channel=message.get("channel"))
+        logger.info("({}) {}: {}".format(channel.get("channel").get("name"),
+                                         user.get("profile").get("display_name"),
+                                         message.get("text")))
         if message.get("text").startswith(self.prefix):
             message["args"] = message.get("text").split()
             self.on_command(message)
