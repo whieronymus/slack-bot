@@ -5,6 +5,7 @@ from collections import defaultdict
 import pdb
 import logging
 import random
+from greetings import greetings
 
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
@@ -25,7 +26,7 @@ def ditto_cmd(cmd):
 
 
 def cats_cmd(cmd):
-    eats = random.randint(1,5)
+    eats = random.randint(1, 5)
 
     if eats == 1:
         return "Cats are Yummy! No kittys here."
@@ -33,11 +34,11 @@ def cats_cmd(cmd):
         # send cat picture
         return "<Cat Picture>"
 
+
 def greet_cmd(cmd):
-    greetings = ['hi', "hello", "hola", "konichiwa"]
-    return greetings.randomchoice()
+    return random.choice(greetings)
 
-
+pdb.set_trace()
 def startproject_cmd(cmd):
     """
     Shows procedure used to start a new project on a certain platform
@@ -162,7 +163,7 @@ def define_commands():
     Command(greet_cmd, 
             "hi",
             "Says hi in a random in a random language")  
-
+zo
 
 def main():
     define_commands()
