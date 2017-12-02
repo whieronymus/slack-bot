@@ -202,8 +202,9 @@ def define_commands():
     Command(greet_cmd,
             "hi",
             "Says hi in a random in a random language")
-    Command(remind_raven,
+    Command(import_cmd,
             "import",
+            '"Imports" useful impormation')
 
 
 
