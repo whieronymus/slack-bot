@@ -7,6 +7,7 @@ import logging
 import random
 from greetings import greetings
 
+
 # starterbot's ID as an environment variable
 BOT_ID = os.environ.get("BOT_ID")
 SLACK_TOKEN = os.environ.get("SLACK_TOKEN_ZORA")
@@ -38,7 +39,7 @@ def cats_cmd(cmd):
 def greet_cmd(cmd):
     return random.choice(greetings)
 
-pdb.set_trace()
+
 def startproject_cmd(cmd):
     """
     Shows procedure used to start a new project on a certain platform
