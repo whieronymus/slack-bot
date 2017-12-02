@@ -133,7 +133,7 @@ class SlackBot(SlackClient):
 
     def on_message(self, **message):
         """This method is ran every time a message is sent"""
-        user = self.api_call("users.info", user=message.get("user"))
+        user = self.api_call("users.info", user=message.get("user")).get("user")
         channel = self.api_call("channels.info", channel=message.get("channel"))
         if user and channel and message.get("text"):
             self.__logger.info("({}) {}: {}".format(channel.get("channel").get("name"),

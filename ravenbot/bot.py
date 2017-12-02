@@ -43,3 +43,7 @@ class Bot(SlackBot):
         user = output.get("user").get("profile")
         self.send_message(self.welcome_channel, "{} has joined ClubPython @here".format(user.get("display_name")))
         self.logger.info("New member has joined the team! ({})".format(user.get("display_name")))
+
+if __name__ == "__main__":
+    token = open("token.txt").read().strip()
+    Bot(token)
