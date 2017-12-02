@@ -145,7 +145,7 @@ class SlackBot(SlackClient):
 
     def on_ready(self, **output):
         """This method is when the bot is ready and reading messages"""
-        print(output.get("type"))
+        self.__logger.info(output.get("type"))
 
     def on_command(self, command):
         """This method is ran every time a command is sent"""

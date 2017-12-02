@@ -1,4 +1,7 @@
-from ravenbot.Slack.slack import SlackBot, SlackCommand
+try:
+    from ravenbot.Slack.slack import SlackBot, SlackCommand
+except ImportError:
+    from Slack.slack import SlackBot, SlackCommand
 import requests
 import json
 import logging
@@ -11,12 +14,12 @@ class Bot(SlackBot):
         self.logger = logging.getLogger(__name__)
 
     @SlackCommand()
-    def ping(ctx):
+    def ping(context):
         """Pong!"""
         ctx.send(":table_tennis_paddle_and_ball: Pong!")
 
     @SlackCommand()
-    def help(ctx, command=None):
+    def help(context, command=None):
         """Get a list of commands or extra information"""
         if command in SlackCommand.commands:  # If command specified exists
             cmd = ctx.bot.get_command(command)  # Get the command
@@ -30,7 +33,7 @@ class Bot(SlackBot):
         ctx.send(help_info)
 
     @SlackCommand()
-    def joke(ctx):
+    def joke(context):
         """Tell me a joke!"""
         response = requests.get("https://icanhazdadjoke.com/", headers={"Accept": "application/json",
                                                                         "User-Agent": "Waffle Slack Bot",
@@ -41,9 +44,10 @@ class Bot(SlackBot):
 
     def on_member_join_team(self, **output):
         user = output.get("user").get("profile")
-        self.send_message(self.welcome_channel, "{} has joined ClubPython @here".format(user.get("display_name")))
+        self.send_message(self.welcome_channel, "{} has joined ClubPython <!here>".format(user.get("display_name")))
         self.logger.info("New member has joined the team! ({})".format(user.get("display_name")))
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     token = open("token.txt").read().strip()
     Bot(token)
