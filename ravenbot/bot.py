@@ -72,7 +72,7 @@ class Bot(SlackBot):
         description = weather_json.get("weather")[0].get("description")
         sun = {"sunrise": sunrise_time, "sunset": sunset_time}
 
-        information = ("> _*Weather in {} ({})*_".fomat(area, description),
+        information = ("> _*Weather in {} ({})*_".format(area, description),
                        "> Temperature: {} °C / {} °F".format(int(weather.get("temp")),
                                                              int(weather.get("temp") * 1.8 + 32)),  # Convert C to F
                        "> Humidity: {}%".format(weather.get("humidity")),
