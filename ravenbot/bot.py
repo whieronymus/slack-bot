@@ -71,7 +71,7 @@ class Bot(SlackBot):
 
         information = ("> _*Weather in {} ({})*_".fomat(area, description),
                        "> Temperature: {} °C / {} °F".format(int(weather.get("temp")),
-                                                             int(weather.get("temp") * 1.8 + 32))  # Convert C to F
+                                                             int(weather.get("temp") * 1.8 + 32)),  # Convert C to F
                        "> Humidity: {}%".format(weather.get("humidity")),
                        "> Sunrise and Sunset: {} / {}".format(sunrise_time.strftime("%H:%M"),
                                                               sunset.strftime("%H:%M")))
