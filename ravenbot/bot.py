@@ -46,7 +46,9 @@ class Bot(SlackBot):
             context.send(json_load.get("joke"))
 
     @SlackCommand()
-    def weather(context, query):
+    def weather(context, *area):
+        query = " ".join(area)
+
         # Request OpenWeatherMap for information (json)
         weather_webapi = "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&APPID={}"
         weather = weather_webapi.format(query, os.environ.get("OPENWEATHERMAP_API_KEY"))
@@ -55,8 +57,11 @@ class Bot(SlackBot):
 
         # Request Google Timezone API for information (json)
         google_tz_webapi = "https://maps.googleapis.com/maps/api/timezone/json?location={},{}&timestamp={}&key={}"
-        google_tz = google_tz_webapi.format(weather_json["coord"]["lat"], weather_json["coord"]["lon"],
-                                            weather_json["dt"], os.environ.get("TZ_GOOGLE_API_KEY"))
+        try:
+            google_tz = google_tz_webapi.format(weather_json["coord"]["lat"], weather_json["coord"]["lon"],
+                                                weather_json["dt"], os.environ.get("TZ_GOOGLE_API_KEY"))
+        except KeyError:
+            return context.send("I can't find anywhere by that name")
         google_tz_response = requests.get(google_tz)
         google_tz_json = json.loads(google_tz_response.text)
         local_tz = timezone(google_tz_json.get("timeZoneId"))
