@@ -6,6 +6,7 @@ import requests
 import json
 import logging
 import os
+from pytz import timezone
 
 
 class Bot(SlackBot):
