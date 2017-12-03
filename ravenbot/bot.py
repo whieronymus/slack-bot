@@ -46,14 +46,14 @@ class Bot(SlackBot):
     def weather(context, query):
         # Request OpenWeatherMap for information (json)
         weather_webapi = "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&APPID={}"
-        weather = weather_webapi.format(query, OPENWEATHERMAP_API_KEY)
+        weather = weather_webapi.format(query, os.environ.get("OPENWEATHERMAP_API_KEY"))
         weather_response = requests.get(weather)
         weather_json = json.loads(weather_response.text)
 
         # Request Google Timezone API for information (json)
         google_tz_webapi = "https://maps.googleapis.com/maps/api/timezone/json?location={},{}&timestamp={}&key={}"
         google_tz = google_tz_webapi.format(weather_json["coord"]["lat"], weather_json["coord"]["lon"],
-                                            weather_json["dt"], TZ_GOOGLE_API_KEY)
+                                            weather_json["dt"], os.environ.get("TZ_GOOGLE_API_KEY"))
         google_tz_response = requests.get(google_tz)
         google_tz_json = json.loads(google_tz_response.text)
         local_tz = timezone(google_tz_json.get("timeZoneId"))
