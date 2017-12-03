@@ -42,6 +42,41 @@ class Bot(SlackBot):
         if json_load.get("status") == 200:
             context.send(json_load.get("joke"))
 
+    @SlackCommand()
+    def weather(context, query):
+        # Request OpenWeatherMap for information (json)
+        weather_webapi = "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&APPID={}"
+        weather = weather_webapi.format(query, OPENWEATHERMAP_API_KEY)
+        weather_response = requests.get(weather)
+        weather_json = json.loads(weather_response.text)
+
+        # Request Google Timezone API for information (json)
+        google_tz_webapi = "https://maps.googleapis.com/maps/api/timezone/json?location={},{}&timestamp={}&key={}"
+        google_tz = google_tz_webapi.format(weather_json["coord"]["lat"], weather_json["coord"]["lon"],
+                                            weather_json["dt"], TZ_GOOGLE_API_KEY)
+        google_tz_response = requests.get(google_tz)
+        google_tz_json = json.loads(google_tz_response.text)
+        local_tz = timezone(google_tz_json.get("timeZoneId"))
+
+        # Convert sunrise/set times to local timezone
+        sunrise_dt = datetime.fromtimestamp(weather_json.get("sys").get("sunrise"))
+        sunrise_time = local_tz.localize(sunrise_dt)
+        sunset_dt = datetime.fromtimestamp(weather_json.get("sys").get("sunset"))
+        sunset_time = local_tz.localize(sunset_dt)
+
+        area = weather_json.get("name")
+        weather = weather_json.get("main")
+        description = weather_json.get("weather")[0].get("description")
+        sun = {"sunrise": sunrise_time, "sunset": sunset_time}
+
+        information = ("> _*Weather in {} ({})*_".fomat(area, description),
+                       "> Temperature: {} °C / {} °F".format(int(weather.get("temp")),
+                                                             int(weather.get("temp") * 1.8 + 32))  # Convert C to F
+                       "> Humidity: {}%".format(weather.get("humidity")),
+                       "> Sunrise and Sunset: {} / {}".format(sunrise_time.strftime("%H:%M"),
+                                                              sunset.strftime("%H:%M")))
+        context.send("\n".join(information))
+
     def on_member_join_team(self, **output):
         user = output.get("user").get("profile")
         self.send_message(self.welcome_channel, "{} has joined ClubPython <!here>".format(user.get("display_name")))
