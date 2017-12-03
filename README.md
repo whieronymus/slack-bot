@@ -20,6 +20,9 @@ Some just for fun, and others to help organize and administer our community.
 If you'd like to get involved just DM me @kill.will on the Slack Channel and I'll you
 some ideas to get started!
 
+#### Waffle
+Coming soon!
+
 #### RookieBot
 Coming Soon!
 
@@ -32,11 +35,6 @@ And thus... RookieBot was born!
 RookieBot's development will use fairly simple and fairly basic techniques, that will be
 easier for beginners to follow. So if you're new but still want to practice/contribute
 RookieBot is there for you! RookieBot will always be there for you.
-
-#### RavenBot
-Coming soon!
-
-
 
 ##### Adding new commands
 Create a new function before `class Command`.
