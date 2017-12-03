@@ -139,9 +139,10 @@ class SlackBot(SlackClient):
             self.__logger.info("({}) {}: {}".format(channel.get("channel").get("name"),
                                                     user.get("profile").get("display_name"),
                                                     message.get("text")))
-        if message.get("text").startswith(self.prefix):
-            message["args"] = message.get("text").split()
-            self.on_command(message)
+        if message.get("text"):
+            if message.get("text").startswith(self.prefix):
+                message["args"] = message.get("text").split()
+                self.on_command(message)
 
     def on_ready(self, **output):
         """This method is when the bot is ready and reading messages"""
