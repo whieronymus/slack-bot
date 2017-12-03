@@ -1,5 +1,5 @@
 try:
-    from ravenbot.Slack.slack import SlackBot, SlackCommand
+    from .Slack.slack import SlackBot, SlackCommand
 except ImportError:
     from Slack.slack import SlackBot, SlackCommand
 import requests
