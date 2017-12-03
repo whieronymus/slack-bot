@@ -70,14 +70,13 @@ class Bot(SlackBot):
         area = weather_json.get("name")
         weather = weather_json.get("main")
         description = weather_json.get("weather")[0].get("description")
-        sun = {"sunrise": sunrise_time, "sunset": sunset_time}
 
         information = ("> _*Weather in {} ({})*_".format(area, description),
                        "> Temperature: {} °C / {} °F".format(int(weather.get("temp")),
                                                              int(weather.get("temp") * 1.8 + 32)),  # Convert C to F
                        "> Humidity: {}%".format(weather.get("humidity")),
                        "> Sunrise and Sunset: {} / {}".format(sunrise_time.strftime("%H:%M"),
-                                                              sunset.strftime("%H:%M")))
+                                                              sunset_time.strftime("%H:%M")))
         context.send("\n".join(information))
 
     def on_member_join_team(self, **output):
