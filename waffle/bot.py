@@ -1,7 +1,4 @@
-try:
-    from .Slack.slack import SlackBot, SlackCommand
-except ImportError:
-    from Slack.slack import SlackBot, SlackCommand
+from .Slack.slack import SlackBot, SlackCommand
 import requests
 import json
 import logging
@@ -47,6 +44,7 @@ class Bot(SlackBot):
 
     @SlackCommand()
     def weather(context, *area):
+        """What's the weather?"""
         query = " ".join(area)
 
         # Request OpenWeatherMap for information (json)
@@ -85,11 +83,12 @@ class Bot(SlackBot):
         context.send("\n".join(information))
 
     def on_member_join_team(self, **output):
+        """Send welcome message if a user joins"""
         user = output.get("user").get("profile")
-        self.send_message(self.welcome_channel, "{} has joined ClubPython <!here>".format(user.get("display_name")))
-        self.logger.info("New member has joined the team! ({})".format(user.get("display_name")))
+        if user.get("display_name"):  # Check which username to use. Preferably the display name.
+            username = user.get("display_name")
+        else:
+            username = user.get("real_name")
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    token = open("token.txt").read().strip()
-    Bot(token)
+        self.send_message(self.welcome_channel, "{} has joined ClubPython <!here>".format(username))
+        self.logger.info("New member has joined the team! ({})".format(user.get("display_name")))
