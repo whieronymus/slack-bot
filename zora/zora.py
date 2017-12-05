@@ -6,6 +6,9 @@ import pdb
 import logging
 import random
 from .greetings import greetings
+import bs4 as bs
+import urllib.request
+
 
 
 # starterbot's ID as an environment variable
@@ -38,6 +41,22 @@ def cats_cmd(cmd):
 
 def greet_cmd(cmd):
     return random.choice(greetings)
+
+def rules_cmd(cmd):
+    """
+    Scrapes a random page from 'Rules for my unborn son'
+    gives a random rule with number"""
+    page = random.randint(1,73)
+    results = []
+    source = urllib.request.urlopen('http://rulesformyunbornson.tumblr.com/page/' + str(page)).read()
+    soup = bs.BeautifulSoup(source, 'lxml')
+
+    for div in soup.find_all('div', class_='regular'):
+        results.append(div.text)
+
+    response =('Rules for my unborn son:' + random.choice(results))
+
+    return response
 
 
 def startproject_cmd(cmd):
@@ -164,6 +183,9 @@ def define_commands():
     Command(greet_cmd, 
             "hi",
             "Says hi in a random in a random language")  
+    Command(rules_cmd, 
+            "rules",
+            "Gives a random rule from rulesformyunbornson.tumblr.com")
 
 
 def main():
