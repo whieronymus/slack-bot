@@ -28,6 +28,44 @@ def ditto_cmd(cmd):
     """
     return " ".join(cmd.split()[1:])
 
+def import_cmd(cmd):
+    """
+    Returns valuable reminders, code, tutorials, etc
+    """
+    module = cmd.split()[1].lower().strip()
+    default = "No module named {}".format(module)
+
+    zen = """
+```The Zen of Python, by Tim Peters
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren't special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!```
+"""
+
+    if module == "this":
+        response = zen
+    else:
+        response = default
+
+    return response
+
 
 def cats_cmd(cmd):
     eats = random.randint(1, 5)
@@ -49,7 +87,7 @@ def rules_cmd(cmd):
     page = random.randint(1,73)
     results = []
     source = urllib.request.urlopen('http://rulesformyunbornson.tumblr.com/page/' + str(page)).read()
-    soup = bs.BeautifulSoup(source, 'lxml')
+    soup = bs.BeautifulSoup(source, 'html.parser')
 
     for div in soup.find_all('div', class_='regular'):
         results.append(div.text)
@@ -177,15 +215,18 @@ def define_commands():
     Command(help_cmd,
             "help",
             "Displays help for given command or all if none given.")
-    Command(cats_cmd, 
+    Command(cats_cmd,
             "yummy",
             "Returns a picture of a cat")
-    Command(greet_cmd, 
+    Command(greet_cmd,
             "hi",
             "Says hi in a random in a random language")  
     Command(rules_cmd, 
             "rules",
             "Gives a random rule from rulesformyunbornson.tumblr.com")
+    Command(import_cmd,
+            "import",
+            '"Imports" useful impormation')
 
 
 def main():

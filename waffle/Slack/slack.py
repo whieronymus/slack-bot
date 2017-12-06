@@ -135,17 +135,18 @@ class SlackBot(SlackClient):
         """This method is ran every time a message is sent"""
         user = self.api_call("users.info", user=message.get("user")).get("user")
         channel = self.api_call("channels.info", channel=message.get("channel"))
-        if user and channel and message.get("text"):
+        if user and channel.get("channel") and message.get("text"):
             self.__logger.info("({}) {}: {}".format(channel.get("channel").get("name"),
                                                     user.get("profile").get("display_name"),
                                                     message.get("text")))
-        if message.get("text").startswith(self.prefix):
-            message["args"] = message.get("text").split()
-            self.on_command(message)
+        if message.get("text"):
+            if message.get("text").startswith(self.prefix):
+                message["args"] = message.get("text").split()
+                self.on_command(message)
 
     def on_ready(self, **output):
         """This method is when the bot is ready and reading messages"""
-        print(output.get("type"))
+        self.__logger.info(output.get("type"))
 
     def on_command(self, command):
         """This method is ran every time a command is sent"""

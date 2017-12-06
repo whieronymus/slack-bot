@@ -1,3 +1,4 @@
+__pycache__/
 
 # We don't want to push env folders to Github
 env/
