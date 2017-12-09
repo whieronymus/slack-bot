@@ -39,7 +39,7 @@ def joke_cmd(cmd):
     -DOG joke API (url)
 
 
-    AUTHOR: @Luna
+    AUTHOR:@Luna
     """
      response = requests.get("https://api.chucknorris.io/jokes/random") # pulls api for random chuch norris jokes 
      response.raise_for_status() # to raise an exception for error codes
