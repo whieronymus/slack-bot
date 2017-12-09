@@ -23,6 +23,33 @@ def ditto_cmd(cmd):
     """
     return " ".join(cmd.split()[1:])
 
+def joke_cmd(cmd):
+    """
+    CURRENT:
+    pulls random chuck norris jokes for zora to tell users when they use the command joke. 
+    the purpose of this is to make people laugh and get more confomtable using 
+    zora and having fun with her.
+    
+    PLANS TO EXTEND:
+    add different kinds of joke api's to randomly pick from to get a different joke each time 
+
+    #ToDo
+    Add more API endpoints for jokes 
+    -IT joke API (url)
+    -DOG joke API (url)
+
+
+    AUTHOR: @Luna
+    """
+     response = requests.get("https://api.chucknorris.io/jokes/random") # pulls api for random chuch norris jokes 
+     response.raise_for_status() # to raise an exception for error codes
+
+     json_data = response.json() #pulls json data from the site 
+
+     joke = json_data.get("value") #pulls json value which is the actual joke 
+
+     return joke
+
 
 def cats_cmd(cmd):
     eats = random.randint(1,5)
@@ -35,7 +62,7 @@ def cats_cmd(cmd):
 
 def greet_cmd(cmd):
     greetings = ['hi', "hello", "hola", "konichiwa"]
-    return greetings.randomchoice()
+    return greetings.random.choice()
 
 
 def startproject_cmd(cmd):
@@ -162,6 +189,10 @@ def define_commands():
     Command(greet_cmd, 
             "hi",
             "Says hi in a random in a random language")  
+     Command(joke_cmd, 
+            "joke", 
+            "tells zora to tell people a random joke")
+
 
 
 def main():
