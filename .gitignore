@@ -8,3 +8,6 @@ env/
 
 # For people using PyCharm
 .idea/
+
+# ignore this for people who arent ravenkls
+start.bat
