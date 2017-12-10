@@ -1,4 +1,5 @@
 from .Slack.slack import SlackBot, SlackCommand
+from .Slack.attachments import Attachment
 import requests
 import json
 import logging
@@ -38,7 +39,7 @@ class Bot(SlackBot):
         response = requests.get("https://icanhazdadjoke.com/", headers={"Accept": "application/json",
                                                                         "User-Agent": "Waffle Slack Bot",
                                                                         "From": "https://github.com/whieronymus"})
-        json_load = json.loads(response.text)
+        json_load = response.json()
         if json_load.get("status") == 200:
             context.send(json_load.get("joke"))
 
@@ -46,12 +47,13 @@ class Bot(SlackBot):
     def weather(context, *area):
         """What's the weather?"""
         query = " ".join(area)
+        tmp_message = context.send("Retrieving information for {}".format(query))
 
         # Request OpenWeatherMap for information (json)
         weather_webapi = "https://api.openweathermap.org/data/2.5/weather?q={}&units=metric&APPID={}"
         weather = weather_webapi.format(query, os.environ.get("OPENWEATHERMAP_API_KEY"))
         weather_response = requests.get(weather)
-        weather_json = json.loads(weather_response.text)
+        weather_json = weather_response.json()
 
         # Request Google Timezone API for information (json)
         google_tz_webapi = "https://maps.googleapis.com/maps/api/timezone/json?location={},{}&timestamp={}&key={}"
@@ -61,7 +63,7 @@ class Bot(SlackBot):
         except KeyError:
             return context.send("I can't find anywhere by that name")
         google_tz_response = requests.get(google_tz)
-        google_tz_json = json.loads(google_tz_response.text)
+        google_tz_json = google_tz_response.json()
         local_tz = timezone(google_tz_json.get("timeZoneId"))
 
         # Convert sunrise/set times to local timezone
@@ -69,18 +71,30 @@ class Bot(SlackBot):
         sunrise_time = local_tz.localize(sunrise_dt)
         sunset_dt = datetime.fromtimestamp(weather_json.get("sys").get("sunset"))
         sunset_time = local_tz.localize(sunset_dt)
+        country_code = weather_json.get("sys").get("country")
 
         area = weather_json.get("name")
         weather = weather_json.get("main")
-        description = weather_json.get("weather")[0].get("description")
+        description = weather_json["weather"][0].get("description")
+        icon_download_url = "http://download.spinetix.com/content/widgets/icons/weather/{}.png"
+        icon = icon_download_url.format(weather_json["weather"][0].get("icon"))
 
-        information = ("> _*Weather in {} ({})*_".format(area, description),
-                       "> Temperature: {} °C / {} °F".format(int(weather.get("temp")),
-                                                             int(weather.get("temp") * 1.8 + 32)),  # Convert C to F
-                       "> Humidity: {}%".format(weather.get("humidity")),
-                       "> Sunrise and Sunset: {} / {}".format(sunrise_time.strftime("%H:%M"),
-                                                              sunset_time.strftime("%H:%M")))
-        context.send("\n".join(information))
+        attachment = Attachment(f"Weather in {area} is: {description}")
+        attachment.title = ":flag-{}: Weather in {} ({})".format(country_code, area, description)
+        attachment.color = "good"
+        attachment.footer = "Information provided by OpenWeatherMap"
+        attachment.thumb_url = icon
+        attachment.add_field(name="Temperature",
+                             value="{} °C / {} °F".format(int(weather.get("temp")),
+                                                          int(weather.get("temp") * 1.8 + 32)),
+                             short=False)
+        attachment.add_field(name="Humidity",
+                             value="{}%".format(weather.get("humidity")))
+        attachment.add_field(name="Sunrise & Sunset",
+                             value="{} / {}".format(sunrise_time.strftime("%H:%M"),
+                                                    sunset_time.strftime("%H:%M")))
+
+        context.bot.edit_attachment(*tmp_message, attachment.data)
 
     def on_member_join_team(self, **output):
         """Send welcome message if a user joins"""

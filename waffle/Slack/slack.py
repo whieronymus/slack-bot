@@ -43,7 +43,10 @@ class Context:
         self.callback = None
 
     def send(self, content):
-        self.bot.send_message(channel=self.command.get("channel"), content=content)
+        return self.bot.send_message(channel=self.command.get("channel"), content=content)
+
+    def attach(self, attachment):
+        return self.bot.send_attachment(channel=self.command.get("channel"), attachment=attachment)
 
 
 class SlackBot(SlackClient):
@@ -86,11 +89,50 @@ class SlackBot(SlackClient):
         """Send a message to a channel
 
         Arguments:
-        channel -- the slack channel ID
+        channel -- the slack channel ID or name
         content -- the message text to send
         """
-        self.rtm_send_message(channel, content)
+        resp = self.api_call("chat.postMessage", channel=channel, text=content, as_user=True)
         self.__logger.debug("Sent a message to {}: {}".format(channel, content))
+        return resp.get("channel"), resp.get("ts")
+
+    def send_attachment(self, channel, attachment, text=""):
+        """Send an attachment to a channel
+
+        Arguments:
+        channel -- the slack channel ID
+        attachment -- the attachment data (dictionary)
+        """
+        resp = self.api_call("chat.postMessage", channel=channel, text=text, attachments=[attachment], as_user=True)
+        self.__logger.debug("Sent an attachment to {}: {}".format(channel, attachment))
+        return resp.get("channel"), resp.get("ts")
+
+    def edit_message(self, channel, ts, content):
+        """Edits a message in a channel
+
+        Arguments:
+        channel -- the slack channel ID or name
+        ts -- the timestamp of the message
+        content -- the message text to send
+        """
+        resp = self.api_call("chat.update", channel=channel, ts=ts, text=content, as_user=True)
+        self.__logger.debug("Sent a message to {}: {}".format(channel, content))
+        return resp.get("ts")
+
+    def edit_attachment(self, channel, ts, attachment, text=""):
+        """Edits an attachment in a channel
+
+        Arguments:
+        channel -- the slack channel ID or name
+        ts -- the timestamp of the message
+        attachment -- the message text to send
+        """
+        resp = self.api_call("chat.update", channel=channel, ts=ts, text=text, attachments=[attachment], as_user=True)
+        self.__logger.debug("Sent a message to {}: {}".format(channel, attachment))
+        return resp.get("ts")
+
+    def rtm_send(self, content):
+        requests.post()
 
     def parse_output(self, output_list):
         """Parse the output of a self.rtm_read() method
