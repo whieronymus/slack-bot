@@ -1,5 +1,5 @@
-from Slack.slack import SlackBot, SlackCommand
-from Slack.attachments import Attachment
+from .Slack.slack import SlackBot, SlackCommand
+from .Slack.attachments import Attachment
 import requests
 import json
 import logging
