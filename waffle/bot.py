@@ -6,6 +6,9 @@ import logging
 import os
 from pytz import timezone
 from datetime import datetime
+from fuzzywuzzy import fuzz
+
+GITHUB_TAGS_SOURCES = "whieronymus/slack-bot/waffle/sources"
 
 
 class Bot(SlackBot):
@@ -32,6 +35,29 @@ class Bot(SlackBot):
                 help_info += "\n• `" + cmd + "`"  # List commands
             help_info += "\n\n Type `help <command>` for more info on that command"
         context.send(help_info)
+
+    @SlackCommand()
+    def tag(context, *query):
+        """Get useful information with tags"""
+        query = " ".join(w.lower() for w in query)
+        path = GITHUB_TAGS_SOURCES.split("/")
+        path.insert(2, "contents")  # tell github we want the contents of this path
+        github_path = "https://api.github.com/repos/" + "/".join(path)  # reconstruct the path into a github api query
+        response = requests.get(github_path)
+        items = response.json()
+        matches = process.extract(query,
+                                  map(lambda i: i.get("name").replace(".md", "").lower(), items))
+        best_matches = list(filter(lambda result: result[1] > 70, matches))
+        if len(best_matches) > 1:
+            return context.send("*Multiple matches:*" + "\n".join(best_matches))
+        elif len(best_matches) < 1:
+            return context.send("Couldn't find anything")
+        else:
+            # very ugly I know, it basically just gets the item from the json which is the best match
+            info = [i for i in items if i.get("name").replace(".md", "").lower() == best_matches[0][0]][0]
+            title = info.get("name")
+            body = requests.get(info.get("download_url")).text
+            return context.send("*{}*\n\n{}".format(title, body))
 
     @SlackCommand()
     def joke(context):
