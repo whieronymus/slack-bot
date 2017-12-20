@@ -6,7 +6,7 @@ import logging
 import os
 from pytz import timezone
 from datetime import datetime
-from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 GITHUB_TAGS_SOURCES = "whieronymus/slack-bot/waffle/sources"
 
